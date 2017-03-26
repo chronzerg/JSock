@@ -1,7 +1,7 @@
 libFile=raiiSocket.a
 testFile=test.out
 
-flags=-g -std=c++11
+flags=-std=c++11
 
 libSource=$(shell find "src" -iname "*.cpp")
 libObjects=$(libSource:.cpp=.o)
@@ -16,18 +16,23 @@ raiiSocket: $(libFile)
 test: $(testFile)
 
 runTest: $(testFile)
-	./$(testFile)
+	@echo "Starting test"
+	@./$(testFile)
 
 clean:
+	@echo "Cleaning"
 	@rm -f $(libFile)
 	@rm -f $(testFile)
 	@rm -f **/*.o
 
 $(libFile): $(libObjects)
-	@ar rs $@ $^
+	@echo "Packaging library"
+	@ar rcs $@ $^
 
 $(testFile): $(testSource) $(libFile)
-	g++ $(flags) $^ -o $@
+	@echo "Linking test"
+	@g++ $(flags) $^ -o $@
 
 %.o: %.cpp
-	g++ -c $(flags) $< -o $@
+	@echo "Compiling $<"
+	@g++ -c $(flags) $< -o $@

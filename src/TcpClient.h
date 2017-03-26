@@ -1,3 +1,7 @@
+#ifndef TcpClient_h
+#define TcpClient_h
+
+#include "SocketException.h"
 #include "StreamSocket.h"
 #include <sys/socket.h>
 #include <netinet/ip.h>
@@ -14,10 +18,12 @@ class TcpClient {
 		unsigned char buffer[TcpClient::MAX_READ_SIZE];
 
 	public:
-		TcpClient(const std::string&, unsigned int);
+		TcpClient(const std::string&, unsigned short);
 		~TcpClient();
 		void write(const std::vector<unsigned char>&);
 		std::vector<unsigned char> read();
 };
 
 } // namespace raiisocket
+
+#endif // TcpClient_h

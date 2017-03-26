@@ -4,43 +4,32 @@
 #include <stdexcept>
 #include <iostream>
 #include <string.h>
+#include <sstream>
+#include <cstring>
+#include <cstdlib>
 #include <errno.h>
 
 namespace raiisocket {
 
-const unsigned int errorStringLength = 50;
-
-TcpClient::TcpClient(const std::string& address, unsigned int port) {
+TcpClient::TcpClient(const std::string& address, unsigned short port) {
 	struct sockaddr_in addressStruct;
+	addressStruct.sin_family = AF_INET;
+	addressStruct.sin_port = htons(port);
 
-	{ // Set the IP address
-		int error = inet_pton(AF_INET, address.c_str(), &(addressStruct.sin_addr));
-		if (error == 0) {
-			std::string message("Invalid IP address: ");
-			message += address;
-			std::cerr << message << std::endl;
-			throw message.c_str();
-		}
-		else if (error < 0) {
-			char errorString[errorStringLength];
-			strerror_r(errno, errorString, errorStringLength);
-			std::cerr << errorString << std::endl;
-			throw errorString;
-		}
+	// Set the IP address
+	int error = inet_pton(AF_INET, address.c_str(),
+			&(addressStruct.sin_addr));
+	if(error == 0) {
+		std::string errorString("Invalid IP address: ");
+		errorString += address;
+		throw SocketException(errorString);
 	}
+	else if (error < 0)
+		throw SocketException(errno);
 
-	{ // Set the port
-		addressStruct.sin_port = port;
-	}
-
-	{ // Connect the socket 
-		int error = connect(this->socket, (struct sockaddr*)&addressStruct, sizeof(addressStruct));
-		if (error < 0) {
-			char errorString[errorStringLength];
-			strerror_r(errno, errorString, errorStringLength);
-			throw errorString;
-		}
-	}
+	// Connect the socket 
+	if(connect(this->socket, (struct sockaddr*)&addressStruct,
+			sizeof(addressStruct)) < 0) throw SocketException(errno);
 }
 
 TcpClient::~TcpClient() {
@@ -55,8 +44,7 @@ void TcpClient::write(const std::vector<unsigned char>& data) {
 std::vector<unsigned char> TcpClient::read() {
 	return std::vector<unsigned char>(this->buffer,
 			this->buffer + recv(this->socket, 
-				this->buffer, sizeof(this->buffer),
-					TcpClient::MAX_READ_SIZE));
+				this->buffer, TcpClient::MAX_READ_SIZE, 0));
 }
 
 }; //namespace raiisocket

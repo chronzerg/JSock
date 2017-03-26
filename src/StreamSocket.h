@@ -1,3 +1,6 @@
+#ifndef StreamSocket_h
+#define StreamSocket_h
+
 namespace raiisocket {
 
 class StreamSocket {
@@ -11,3 +14,5 @@ class StreamSocket {
 };
 
 } // namespace RaiiSocket
+
+#endif // StreamSocket_h
