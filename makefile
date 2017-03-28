@@ -1,19 +1,19 @@
-libFile=raiiSocket.a
+libFile=jsock.a
 testFile=test.out
 
-libraries=-lncurses
-flags=-g -std=c++11 $(libraries)
+libs=-lncurses
+flags=-g -std=c++11 $(libs)
 
 libSource=$(shell find "src" -iname "*.cpp")
 libObjects=$(libSource:.cpp=.o)
 testSource=$(shell find "test" -iname "*.cpp")
 testObjects=$(testSource:.cpp=.o)
 
-.PHONY: all raiiSocket test
+.PHONY: all jsock test
 
-all: raiiSocket
+all: jsock
 
-raiiSocket: $(libFile)
+jsock: $(libFile)
 
 test: $(testFile)
 
