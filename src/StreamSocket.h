@@ -11,6 +11,7 @@ class StreamSocket {
 		StreamSocket();
 		~StreamSocket();
 		operator int();
+		void throwIfError();
 };
 
 } // namespace RaiiSocket

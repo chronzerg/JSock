@@ -3,8 +3,6 @@
 
 #include "SocketException.h"
 #include "StreamSocket.h"
-#include <sys/socket.h>
-#include <netinet/ip.h>
 #include <vector>
 #include <string>
 

@@ -10,24 +10,29 @@ namespace raiisocket {
 
 struct SocketException : public std::exception {
 	private:
-		static const unsigned int ERR_STR_SIZE = 50;
 		std::string message;
+		int errorNumber_ = -1;
 
 	public:
 		SocketException(const std::string& message):
 			message(message) {}
 
 		SocketException(int errorNumber) {
+			this->errorNumber_ = errorNumber;
 			std::stringstream errorStream;
-			errorStream << "SOCKET ERROR " << errno
-				<< ": " << strerror(errorNumber);
-			this->message = errorStream.str();
+			errorStream << "Error " << errorNumber;
+			SocketException(errorStream.str());
 		}
 
 		~SocketException() throw () {}
 
-		const char* what() const throw()
-			{ return message.c_str(); }
+		const char* what() const throw() {
+			return message.c_str();
+		}
+
+		int errorNumber() const {
+			return this->errorNumber_;
+		}
 };
 
 } // namespace raiisocket
