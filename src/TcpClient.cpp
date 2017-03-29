@@ -1,6 +1,7 @@
 #include "TcpClient.h"
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <algorithm>
 #include <string.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -52,7 +53,7 @@ std::vector<unsigned char> TcpClient::read() {
 			throw SocketException(errno);
 	}
 	return std::vector<unsigned char>(this->buffer,
-		this->buffer + readSize);
+		this->buffer + std::max(readSize, 0));
 }
 
 }; //namespace jsock

@@ -40,15 +40,15 @@ int main() {
 					catch(const NoInputException& e) {}
 					std::vector<unsigned char> data = socket.read();
 					if (data.size() > 0) {
-						printw("\n%s", std::string(&data[0],
-						&data[0] + data.size()).c_str());
+						printw("\r%s", std::string(&data[0],
+							&data[0] + data.size()).c_str());
 						printw("> %s", stream.str().c_str()); 
 					}
 				} while(in != '\n');
 				const std::string& str = stream.str();
 				printw("> %s", str.c_str());
-				socket.write(std::vector<unsigned char>(&str[0],
-						&str[0] + str.size()));
+				socket.write(std::vector<unsigned char>(&str[0], 
+					&str[0] + str.size()));
 			}
 		}
 		catch(const jsock::SocketException& problem) {
