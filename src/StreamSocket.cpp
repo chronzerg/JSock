@@ -7,7 +7,7 @@
 #include <sstream>
 #include <errno.h>
 
-namespace raiisocket {
+namespace jsock {
 
 const unsigned int errorStringLength = 50;
 
@@ -41,4 +41,4 @@ void StreamSocket::throwIfError() {
 	}
 }
 
-} // namespace raiisocket
+} // namespace jsock

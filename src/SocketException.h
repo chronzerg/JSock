@@ -6,7 +6,7 @@
 #include <sstream>
 #include <string>
 
-namespace raiisocket {
+namespace jsock {
 
 struct SocketException : public std::exception {
 	private:
@@ -35,6 +35,6 @@ struct SocketException : public std::exception {
 		}
 };
 
-} // namespace raiisocket
+} // namespace jsock
 
 #endif // SocketException_h

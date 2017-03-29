@@ -5,7 +5,7 @@
 #include <fcntl.h>
 #include <errno.h>
 
-namespace raiisocket {
+namespace jsock {
 
 TcpClient::TcpClient(const std::string& address,
 		unsigned short port) {
@@ -28,8 +28,8 @@ TcpClient::TcpClient(const std::string& address,
 
 	int flags = fcntl(this->socket, F_GETFL, 0);
 	if (flags < 0) throw SocketException(errno);
-	flags = fcntl(this->socket, F_SETFL, flags | O_NONBLOCK);
-	if (flags < 0) throw SocketException(errno);
+	int result = fcntl(this->socket, F_SETFL, flags | O_NONBLOCK);
+	if (result < 0) throw SocketException(errno);
 }
 
 TcpClient::~TcpClient() {
@@ -39,8 +39,7 @@ TcpClient::~TcpClient() {
 void TcpClient::write(const std::vector<unsigned char>& data) {
 	this->socket.throwIfError();
 	if(send(this->socket, &data[0], data.size(), 0) < 0)
-		if (errno != EINPROGRESS)
-			throw SocketException(errno);
+		throw SocketException(errno);
 }
 
 std::vector<unsigned char> TcpClient::read() {
@@ -48,13 +47,12 @@ std::vector<unsigned char> TcpClient::read() {
 	int readSize = recv(this->socket, this->buffer,
 			TcpClient::MAX_READ_SIZE, 0);
 	if (readSize < 0) {
-		if (errno != EINPROGRESS)
+		if (errno != EWOULDBLOCK)
 		if (errno != EAGAIN)
 			throw SocketException(errno);
 	}
-	else return std::vector<unsigned char>(this->buffer,
-			this->buffer + readSize);
-	return std::vector<unsigned char>();
+	return std::vector<unsigned char>(this->buffer,
+		this->buffer + readSize);
 }
 
-}; //namespace raiisocket
+}; //namespace jsock

@@ -19,5 +19,5 @@ while True:
         display(message)
         message = conn.recv(4096)
         if not message:
-            display("disconnected from " + str(address))
+            display("disconnected from " + str(address) + '\n')
             break

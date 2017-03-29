@@ -6,7 +6,7 @@
 #include <vector>
 #include <string>
 
-namespace raiisocket {
+namespace jsock {
 
 
 class TcpClient {
@@ -22,6 +22,6 @@ class TcpClient {
 		std::vector<unsigned char> read();
 };
 
-} // namespace raiisocket
+} // namespace jsock
 
 #endif // TcpClient_h

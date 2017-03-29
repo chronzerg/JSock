@@ -1,7 +1,7 @@
 #ifndef StreamSocket_h
 #define StreamSocket_h
 
-namespace raiisocket {
+namespace jsock {
 
 class StreamSocket {
 	private:
@@ -14,6 +14,6 @@ class StreamSocket {
 		void throwIfError();
 };
 
-} // namespace RaiiSocket
+} // namespace jsock
 
 #endif // StreamSocket_h
