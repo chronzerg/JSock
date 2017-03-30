@@ -48,18 +48,18 @@ void processSocketInput(const jsock::TcpClient& socket,
 	std::vector<unsigned char> received = socket.read();
 	data.insert(data.end(), received.begin(), received.end());
 
-	// Find the last instance of the null character.
-	std::vector<unsigned char>::reverse_iterator lastNull;
-	lastNull = std::find(data.rbegin(), data.rend(), '\n');
+	// Find the last instance of the newline character.
+	std::vector<unsigned char>::reverse_iterator lastNewline;
+	lastNewline = std::find(data.rbegin(), data.rend(), '\n');
 
-	// If we found something, grab everything before the split
+	// If we found something, grab everything before the newline
 	// and print it. Leave the rest in the static vector.
-	if (lastNull != data.rend()) {
+	if (lastNewline != data.rend()) {
 		std::vector<unsigned char> message(data.begin(),
-			lastNull.base());
-		message.push_back('\0');
-		data.erase(data.begin(), lastNull.base());
+			lastNewline.base());
+		data.erase(data.begin(), lastNewline.base());
 
+		message.push_back('\0');
 		printw("\r%s", &message[0]);
 
 		// Redraw the current line of input after the message we
