@@ -26,11 +26,6 @@ TcpClient::TcpClient(const std::string& address,
 
 	if(connect(this->socket, (struct sockaddr*)&addressStruct,
 		sizeof(addressStruct)) < 0) throw SocketException(errno);
-
-	int flags = fcntl(this->socket, F_GETFL, 0);
-	if (flags < 0) throw SocketException(errno);
-	int result = fcntl(this->socket, F_SETFL, flags | O_NONBLOCK);
-	if (result < 0) throw SocketException(errno);
 }
 
 TcpClient::~TcpClient() {
@@ -39,14 +34,14 @@ TcpClient::~TcpClient() {
 
 void TcpClient::write(const std::vector<unsigned char>& data) const {
 	this->socket.throwIfError();
-	if(send(this->socket, &data[0], data.size(), 0) < 0)
+	if(send(this->socket, &data[0], data.size(), MSG_DONTWAIT) < 0)
 		throw SocketException(errno);
 }
 
 std::vector<unsigned char> TcpClient::read() const {
 	this->socket.throwIfError();
 	int readSize = recv(this->socket, (void*)this->buffer,
-			TcpClient::MAX_READ_SIZE, 0);
+			TcpClient::MAX_READ_SIZE, MSG_DONTWAIT);
 	if (readSize < 0) {
 		if (errno != EWOULDBLOCK)
 		if (errno != EAGAIN)
