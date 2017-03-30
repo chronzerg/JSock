@@ -24,11 +24,11 @@ StreamSocket::~StreamSocket() {
 	close(this->fileDescriptor);
 }
 
-StreamSocket::operator int() {
+StreamSocket::operator int() const {
 	return this->fileDescriptor;
 }
 
-void StreamSocket::throwIfError() {
+void StreamSocket::throwIfError() const {
 	int error = 0;
 	socklen_t errorSize = sizeof(error);
 	int getError = getsockopt(*this,

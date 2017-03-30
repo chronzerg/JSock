@@ -18,8 +18,8 @@ class TcpClient {
 	public:
 		TcpClient(const std::string&, unsigned short);
 		~TcpClient();
-		void write(const std::vector<unsigned char>&);
-		std::vector<unsigned char> read();
+		void write(const std::vector<unsigned char>&) const;
+		std::vector<unsigned char> read() const;
 };
 
 } // namespace jsock

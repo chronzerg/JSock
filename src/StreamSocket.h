@@ -10,8 +10,8 @@ class StreamSocket {
 	public:
 		StreamSocket();
 		~StreamSocket();
-		operator int();
-		void throwIfError();
+		operator int() const;
+		void throwIfError() const;
 };
 
 } // namespace jsock

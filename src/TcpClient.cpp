@@ -37,15 +37,15 @@ TcpClient::~TcpClient() {
 	shutdown(this->socket, SHUT_RDWR);
 }
 
-void TcpClient::write(const std::vector<unsigned char>& data) {
+void TcpClient::write(const std::vector<unsigned char>& data) const {
 	this->socket.throwIfError();
 	if(send(this->socket, &data[0], data.size(), 0) < 0)
 		throw SocketException(errno);
 }
 
-std::vector<unsigned char> TcpClient::read() {
+std::vector<unsigned char> TcpClient::read() const {
 	this->socket.throwIfError();
-	int readSize = recv(this->socket, this->buffer,
+	int readSize = recv(this->socket, (void*)this->buffer,
 			TcpClient::MAX_READ_SIZE, 0);
 	if (readSize < 0) {
 		if (errno != EWOULDBLOCK)
