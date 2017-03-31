@@ -9,6 +9,7 @@ class StreamSocket {
 
 	public:
 		StreamSocket();
+		StreamSocket(unsigned short fileDescriptor);
 		~StreamSocket();
 		operator int() const;
 		void throwIfError() const;

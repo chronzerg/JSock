@@ -1,6 +1,6 @@
 #include "TcpClient.h"
-#include <arpa/inet.h>
 #include <sys/socket.h>
+#include <arpa/inet.h>
 #include <algorithm>
 #include <string.h>
 #include <fcntl.h>
@@ -27,6 +27,9 @@ TcpClient::TcpClient(const std::string& address,
 	if(connect(this->socket, (struct sockaddr*)&addressStruct,
 		sizeof(addressStruct)) < 0) throw SocketException(errno);
 }
+
+TcpClient::TcpClient(StreamSocket& socket):
+	socket(socket) {}
 
 TcpClient::~TcpClient() {
 	shutdown(this->socket, SHUT_RDWR);

@@ -14,11 +14,12 @@ const unsigned int errorStringLength = 50;
 StreamSocket::StreamSocket() {
 	this->fileDescriptor = socket(AF_INET, SOCK_STREAM, 0);
 	if (this->fileDescriptor < 0) {
-		char errorString[errorStringLength];
-		strerror_r(errno, errorString, errorStringLength);
-		throw std::runtime_error(std::string(errorString));
+		throw SocketException(errno);
 	}
 }
+
+StreamSocket::StreamSocket(unsigned short fileDescriptor):
+	fileDescriptor(fileDescriptor) {}
 
 StreamSocket::~StreamSocket() {
 	close(this->fileDescriptor);
