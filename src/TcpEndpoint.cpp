@@ -1,4 +1,4 @@
-#include "TcpClient.h"
+#include "TcpEndpoint.h"
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <algorithm>
@@ -8,8 +8,8 @@
 
 namespace jsock {
 
-TcpClient::TcpClient(const std::string& address,
-		unsigned short port) {
+TcpEndpoint::TcpEndpoint(const std::string& address,
+		unsigned short port): socket(stream) {
 	struct sockaddr_in addressStruct;
 	addressStruct.sin_family = AF_INET;
 	addressStruct.sin_port = htons(port);
@@ -28,23 +28,23 @@ TcpClient::TcpClient(const std::string& address,
 		sizeof(addressStruct)) < 0) throw SocketException(errno);
 }
 
-TcpClient::TcpClient(int fileDescriptor):
+TcpEndpoint::TcpEndpoint(int fileDescriptor):
 	socket(fileDescriptor) {}
 
-TcpClient::~TcpClient() {
+TcpEndpoint::~TcpEndpoint() {
 	shutdown(this->socket, SHUT_RDWR);
 }
 
-void TcpClient::write(const std::vector<unsigned char>& data) const {
+void TcpEndpoint::write(const std::vector<unsigned char>& data) const {
 	this->socket.throwIfError();
 	if(send(this->socket, &data[0], data.size(), MSG_DONTWAIT) < 0)
 		throw SocketException(errno);
 }
 
-std::vector<unsigned char> TcpClient::read() const {
+std::vector<unsigned char> TcpEndpoint::read() const {
 	this->socket.throwIfError();
 	int readSize = recv(this->socket, (void*)this->buffer,
-			TcpClient::MAX_READ_SIZE, MSG_DONTWAIT);
+			TcpEndpoint::MAX_READ_SIZE, MSG_DONTWAIT);
 	if (readSize < 0) {
 		if (errno != EWOULDBLOCK)
 		if (errno != EAGAIN)

@@ -1,10 +1,11 @@
+#include "TcpEndpoint.h"
 #include "TcpServer.h"
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
 namespace jsock {
 
-TcpServer::TcpServer(unsigned int port) {
+TcpServer::TcpServer(unsigned int port): socket(stream) {
 	struct sockaddr_in address;
 	address.sin_family = AF_INET;
 	address.sin_port = htons(port);
@@ -17,13 +18,13 @@ TcpServer::TcpServer(unsigned int port) {
 		throw SocketException(errno);
 }
 
-TcpClient TcpServer::accept() const {
+TcpEndpoint TcpServer::accept() const {
 	struct sockaddr_in address;
 	socklen_t length = sizeof(address);
 	int fileDescriptor = ::accept(this->socket,
 		(struct sockaddr*)&address, &length);
 	if (fileDescriptor < 0) throw SocketException(errno);
-	return TcpClient(fileDescriptor);
+	return TcpEndpoint(fileDescriptor);
 }
 
 } // namespace jsock

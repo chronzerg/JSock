@@ -1,4 +1,4 @@
-#include "../src/TcpClient.h"
+#include "../src/TcpEndpoint.h"
 #include <algorithm>
 #include <ncurses.h>
 #include <iostream>
@@ -19,7 +19,7 @@ WINDOW* setupWindow() {
 
 // Collect input from stdin. Send what we've collected
 // when we reach a newline.
-void processSocketOutput(const jsock::TcpClient& socket,
+void processSocketOutput(const jsock::TcpEndpoint& socket,
 		std::stringstream& stream) {
 	char in = getch();
 	if (in != ERR) {
@@ -40,7 +40,7 @@ void processSocketOutput(const jsock::TcpClient& socket,
 
 // Check for socket input. If we have some, print it do
 // the screen.
-void processSocketInput(const jsock::TcpClient& socket,
+void processSocketInput(const jsock::TcpEndpoint& socket,
 		std::stringstream& stream) {
 	static std::vector<unsigned char> data;
 
@@ -73,7 +73,7 @@ int main(int argCount, char* argArray[]) {
 	printw("Connecting...\n");
 	while(1) {
 		try {
-			jsock::TcpClient socket("127.0.0.1", 1234);
+			jsock::TcpEndpoint socket("127.0.0.1", 1234);
 			printw("Connected!\n");
 			std::stringstream stream;
 			printw("> ");

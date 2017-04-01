@@ -1,5 +1,5 @@
 #include "SocketException.h"
-#include "StreamSocket.h"
+#include "Socket.h"
 #include <sys/socket.h>
 #include <stdexcept>
 #include <unistd.h>
@@ -9,27 +9,25 @@
 
 namespace jsock {
 
-const unsigned int errorStringLength = 50;
-
-StreamSocket::StreamSocket() {
+Socket::Socket(SocketType type) {
 	this->fileDescriptor = socket(AF_INET, SOCK_STREAM, 0);
 	if (this->fileDescriptor < 0) {
 		throw SocketException(errno);
 	}
 }
 
-StreamSocket::StreamSocket(int fileDescriptor):
+Socket::Socket(int fileDescriptor):
 	fileDescriptor(fileDescriptor) {}
 
-StreamSocket::~StreamSocket() {
+Socket::~Socket() {
 	close(this->fileDescriptor);
 }
 
-StreamSocket::operator int() const {
+Socket::operator int() const {
 	return this->fileDescriptor;
 }
 
-void StreamSocket::throwIfError() const {
+void Socket::throwIfError() const {
 	int error = 0;
 	socklen_t errorSize = sizeof(error);
 	int getError = getsockopt(*this,

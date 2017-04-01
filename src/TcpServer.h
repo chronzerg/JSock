@@ -1,17 +1,18 @@
 #ifndef TcpServer_h
 #define TcpServer_h
 
-#include "TcpClient.h"
+#include "TcpEndpoint.h"
+#include "Socket.h"
 
 namespace jsock {
 
 class TcpServer {
 	private:
-		StreamSocket socket;
+		Socket socket;
 
 	public:
 		TcpServer(unsigned int port);
-		TcpClient accept() const;
+		TcpEndpoint accept() const;
 };
 
 } // namespace jsock

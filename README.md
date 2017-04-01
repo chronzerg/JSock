@@ -1,2 +1,2 @@
-# RaiiSocket
+# JSock
 Socket API using RAII principles

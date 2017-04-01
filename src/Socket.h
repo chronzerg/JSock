@@ -1,16 +1,23 @@
 #ifndef StreamSocket_h
 #define StreamSocket_h
 
+#include <sys/socket.h>
+
 namespace jsock {
 
-class StreamSocket {
+enum SocketType {
+	datagram = SOCK_DGRAM,
+	stream = SOCK_STREAM
+};
+
+class Socket {
 	private:
 		int fileDescriptor;
 
 	public:
-		StreamSocket();
-		StreamSocket(int fileDescriptor);
-		~StreamSocket();
+		Socket(SocketType type);
+		Socket(int fileDescriptor);
+		~Socket();
 		operator int() const;
 		void throwIfError() const;
 };
