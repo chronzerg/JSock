@@ -28,8 +28,8 @@ TcpClient::TcpClient(const std::string& address,
 		sizeof(addressStruct)) < 0) throw SocketException(errno);
 }
 
-TcpClient::TcpClient(StreamSocket& socket):
-	socket(socket) {}
+TcpClient::TcpClient(int fileDescriptor):
+	socket(fileDescriptor) {}
 
 TcpClient::~TcpClient() {
 	shutdown(this->socket, SHUT_RDWR);

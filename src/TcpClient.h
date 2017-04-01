@@ -17,7 +17,7 @@ class TcpClient {
 
 	public:
 		TcpClient(const std::string&, unsigned short);
-		TcpClient(StreamSocket socket);
+		TcpClient(int fileDescriptor);
 		~TcpClient();
 		void write(const std::vector<unsigned char>&) const;
 		std::vector<unsigned char> read() const;

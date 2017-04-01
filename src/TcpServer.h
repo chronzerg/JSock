@@ -1,3 +1,6 @@
+#ifndef TcpServer_h
+#define TcpServer_h
+
 #include "TcpClient.h"
 
 namespace jsock {
@@ -12,3 +15,5 @@ class TcpServer {
 };
 
 } // namespace jsock
+
+#endif // TcpServer_h

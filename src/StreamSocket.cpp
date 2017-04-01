@@ -18,7 +18,7 @@ StreamSocket::StreamSocket() {
 	}
 }
 
-StreamSocket::StreamSocket(unsigned short fileDescriptor):
+StreamSocket::StreamSocket(int fileDescriptor):
 	fileDescriptor(fileDescriptor) {}
 
 StreamSocket::~StreamSocket() {

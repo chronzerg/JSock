@@ -1,13 +1,13 @@
 libFile=jsock.a
-testFile=test.out
 
 libs=-lncurses
 flags=-g -std=c++11 $(libs)
 
 libSource=$(shell find "src" -iname "*.cpp")
 libObjects=$(libSource:.cpp=.o)
-testSource=$(shell find "test" -iname "*.cpp")
-testObjects=$(testSource:.cpp=.o)
+demoSources=$(shell find "demos" -iname "*.cpp")
+demoExecs=$(addsuffix .out, \
+	$(notdir $(basename $(demoSources))))
 
 .PHONY: all jsock test
 
@@ -15,26 +15,23 @@ all: jsock
 
 jsock: $(libFile)
 
-test: $(testFile)
-
-runTest: $(testFile)
-	@echo "Starting test"
-	@./$(testFile)
+demos: $(demoExecs)
 
 clean:
 	@echo "Cleaning"
 	@rm -f $(libFile)
-	@rm -f $(testFile)
+	@rm -f *.out
 	@rm -f **/*.o
 
 $(libFile): $(libObjects)
 	@echo "Packaging library"
 	@ar rcs $@ $^
 
-$(testFile): $(testObjects) $(libFile)
-	@echo "Linking test"
+%.out: demos/%.cpp $(libFile)
+	@echo "Building $(basename $@)"
 	@g++ $(flags) $^ -o $@
 
 %.o: %.cpp
 	@echo "Compiling $<"
 	@g++ -c $(flags) $< -o $@
+

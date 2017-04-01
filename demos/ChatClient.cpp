@@ -1,7 +1,7 @@
-#include "../src/SocketException.h"
 #include "../src/TcpClient.h"
 #include <algorithm>
 #include <ncurses.h>
+#include <iostream>
 #include <unistd.h>
 #include <sstream>
 #include <errno.h>
@@ -68,16 +68,16 @@ void processSocketInput(const jsock::TcpClient& socket,
 	}
 }
 
-int main() {
+int main(int argCount, char* argArray[]) {
 	WINDOW* window = setupWindow();
 	printw("Connecting...\n");
-	while(true) {
+	while(1) {
 		try {
 			jsock::TcpClient socket("127.0.0.1", 1234);
 			printw("Connected!\n");
 			std::stringstream stream;
 			printw("> ");
-			while(true) {
+			while(1) {
 				processSocketOutput(socket, stream);
 				processSocketInput(socket, stream);
 			}
