@@ -3,6 +3,7 @@
 
 #include "TcpEndpoint.h"
 #include "Socket.h"
+#include <memory>
 
 namespace jsock {
 
@@ -12,7 +13,7 @@ class TcpServer {
 
 	public:
 		TcpServer(unsigned int port);
-		TcpEndpoint accept() const;
+		std::unique_ptr<Endpoint> accept() const;
 };
 
 } // namespace jsock

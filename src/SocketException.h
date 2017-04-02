@@ -8,7 +8,7 @@
 
 namespace jsock {
 
-struct SocketException : public std::exception {
+struct SocketException: public std::exception {
 	private:
 		std::string message;
 		int errorNumber_ = -1;

@@ -35,19 +35,19 @@ TcpEndpoint::~TcpEndpoint() {
 	shutdown(this->socket, SHUT_RDWR);
 }
 
-void TcpEndpoint::write(const std::vector<unsigned char>& data) const {
+void TcpEndpoint::write(const std::vector<unsigned char>& data) {
 	this->socket.throwIfError();
 	if(send(this->socket, &data[0], data.size(), MSG_DONTWAIT) < 0)
 		throw SocketException(errno);
 }
 
-std::vector<unsigned char> TcpEndpoint::read() const {
+std::vector<unsigned char> TcpEndpoint::read() {
 	this->socket.throwIfError();
 	int readSize = recv(this->socket, (void*)this->buffer,
 			TcpEndpoint::MAX_READ_SIZE, MSG_DONTWAIT);
 	if (readSize < 0) {
-		if (errno != EWOULDBLOCK)
 		if (errno != EAGAIN)
+		if (errno != EWOULDBLOCK)
 			throw SocketException(errno);
 	}
 	return std::vector<unsigned char>(this->buffer,

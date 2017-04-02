@@ -9,7 +9,7 @@
 
 namespace jsock {
 
-class TcpEndpoint: virtual public Endpoint {
+class TcpEndpoint: public virtual Endpoint {
 	private:
 		Socket socket;
 		const static unsigned int MAX_READ_SIZE = 256;
@@ -19,8 +19,11 @@ class TcpEndpoint: virtual public Endpoint {
 		TcpEndpoint(const std::string&, unsigned short);
 		TcpEndpoint(int fileDescriptor);
 		~TcpEndpoint();
-		void write(const std::vector<unsigned char>&) const;
-		std::vector<unsigned char> read() const;
+
+		// write() and read() could be const methods, but
+		// the interface calls for non-const.
+		void write(const std::vector<unsigned char>&);
+		std::vector<unsigned char> read();
 };
 
 } // namespace jsock

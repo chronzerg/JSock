@@ -19,7 +19,7 @@ WINDOW* setupWindow() {
 
 // Collect input from stdin. Send what we've collected
 // when we reach a newline.
-void processSocketOutput(const jsock::TcpEndpoint& socket,
+void processSocketOutput(jsock::TcpEndpoint& socket,
 		std::stringstream& stream) {
 	char in = getch();
 	if (in != ERR) {
@@ -40,7 +40,7 @@ void processSocketOutput(const jsock::TcpEndpoint& socket,
 
 // Check for socket input. If we have some, print it do
 // the screen.
-void processSocketInput(const jsock::TcpEndpoint& socket,
+void processSocketInput(jsock::TcpEndpoint& socket,
 		std::stringstream& stream) {
 	static std::vector<unsigned char> data;
 

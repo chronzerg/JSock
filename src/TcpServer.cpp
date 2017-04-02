@@ -2,6 +2,7 @@
 #include "TcpServer.h"
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <fcntl.h>
 
 namespace jsock {
 
@@ -16,15 +17,25 @@ TcpServer::TcpServer(unsigned int port): socket(stream) {
 
 	if (listen(this->socket, 10) < 0)
 		throw SocketException(errno);
+
+	int flags = fcntl(this->socket, F_GETFL, 0);
+	if (flags < 0) throw SocketException(errno);
+	int errors = fcntl(this->socket, F_SETFL, flags | O_NONBLOCK);
+	if (errors < 0) throw SocketException(errno);
 }
 
-TcpEndpoint TcpServer::accept() const {
+std::unique_ptr<Endpoint> TcpServer::accept() const {
 	struct sockaddr_in address;
 	socklen_t length = sizeof(address);
 	int fileDescriptor = ::accept(this->socket,
 		(struct sockaddr*)&address, &length);
-	if (fileDescriptor < 0) throw SocketException(errno);
-	return TcpEndpoint(fileDescriptor);
+	if (fileDescriptor < 0) 
+		if (errno != EAGAIN)
+		if (errno != EWOULDBLOCK)
+			throw SocketException(errno);
+	return std::unique_ptr<Endpoint>(
+			fileDescriptor < 0 ? NULL :
+			new TcpEndpoint(fileDescriptor));
 }
 
 } // namespace jsock

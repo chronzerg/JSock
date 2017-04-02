@@ -5,9 +5,55 @@
 #include <unistd.h>
 #include <sstream>
 #include <errno.h>
+#include <memory>
 #include <vector>
 #include <string>
 
+// Collects message fragments from the underlying
+// endpoint and provides them to the caller as a
+// completed message.
+class ParsingEndpoint: public virtual jsock::Endpoint {
+	private:
+		std::vector<unsigned char> buffer;
+		std::unique_ptr<jsock::Endpoint> socket;
+
+	public:
+		ParsingEndpoint(std::unique_ptr<jsock::Endpoint> socket):
+				socket(std::move(socket)) {}
+
+		// Passthrough to the underlying socket
+		void write(const std::vector<unsigned char>& data) {
+			this->socket->write(data);
+		}
+
+		// Reads data from the socket and appends it to the running
+		// data buffer. If at least one message is completed, return
+		// it/them to the caller. Otherwise, return an empty vector.
+		std::vector<unsigned char> read() {
+			std::vector<unsigned char> received = this->socket->read();
+			this->buffer.insert(this->buffer.end(), received.begin(),
+					received.end());
+
+			// Find the last instance of the newline character. This
+			// signifies a message boundary.
+			std::vector<unsigned char>::reverse_iterator lastNewline;
+			lastNewline = std::find(buffer.rbegin(), this->buffer.rend(), '\n');
+
+			// If we found something, grab everything before the newline
+			// and print it. Leave the rest in buffer.
+			if (lastNewline != buffer.rend()) {
+				std::vector<unsigned char> message(this->buffer.begin(),
+					lastNewline.base());
+				this->buffer.erase(this->buffer.begin(), lastNewline.base());
+				message.push_back('\0');
+				return message;
+			}
+			return std::vector<unsigned char>();
+		}
+};
+
+// Initializes the ncurses library as our UI
+// framework.
 WINDOW* setupWindow() {
 	WINDOW* window = initscr();
 	if(nodelay(window, true) == ERR) {
@@ -17,9 +63,22 @@ WINDOW* setupWindow() {
 	return window;
 }
 
+// Attempt to accept a new connection from the TCP server.
+// If we get one, add it to the endpoints vector.
+void acceptNewConnections(
+		std::vector<std::unique_ptr<jsock::Endpoint>>& endpoints,
+		jsock::TcpServer& server) {
+	std::unique_ptr<jsock::Endpoint> client = server.accept();
+	if (client)
+		endpoints.push_back(
+			std::unique_ptr<jsock::Endpoint>(
+				new ParsingEndpoint(std::move(client))));
+}
+
 // Collect input from stdin. Send what we've collected
 // when we reach a newline.
-void processSocketOutput(const jsock::TcpEndpoint& socket,
+void processSocketOutput(
+		const std::vector<std::unique_ptr<jsock::Endpoint>>& endpoints,
 		std::stringstream& stream) {
 	char in = getch();
 	if (in != ERR) {
@@ -27,8 +86,10 @@ void processSocketOutput(const jsock::TcpEndpoint& socket,
 		if (in == '\n') {
 			const std::string& str = stream.str();
 			printw("> %s", str.c_str());
-			socket.write(std::vector<unsigned char>(&str[0],
-				&str[0] + str.size()));
+			for(const auto& socket: endpoints) {
+				socket->write(std::vector<unsigned char>(&str[0],
+					&str[0] + str.size()));
+			}
 
 			// Reset the stream
 			stream.str("");
@@ -38,49 +99,40 @@ void processSocketOutput(const jsock::TcpEndpoint& socket,
 	}
 }
 
-// Check for socket input. If we have some, print it do
-// the screen.
-void processSocketInput(const jsock::TcpEndpoint& socket,
+// Check the endpoints for new messages. If there are any, print
+// them to the screen and resend them to the other clients.
+void processSocketInput(
+		std::vector<std::unique_ptr<jsock::Endpoint>>& endpoints,
 		std::stringstream& stream) {
-	static std::vector<unsigned char> data;
-
-	// Read from the socket and append it to our static vector.
-	std::vector<unsigned char> received = socket.read();
-	data.insert(data.end(), received.begin(), received.end());
-
-	// Find the last instance of the newline character.
-	std::vector<unsigned char>::reverse_iterator lastNewline;
-	lastNewline = std::find(data.rbegin(), data.rend(), '\n');
-
-	// If we found something, grab everything before the newline
-	// and print it. Leave the rest in the static vector.
-	if (lastNewline != data.rend()) {
-		std::vector<unsigned char> message(data.begin(),
-			lastNewline.base());
-		data.erase(data.begin(), lastNewline.base());
-
-		message.push_back('\0');
-		printw("\r%s", &message[0]);
-
-		// Redraw the current line of input after the message we
-		// just received.
-		printw("> %s", stream.str().c_str());
+	bool output = false;
+	for(const auto& recvpoint: endpoints) {
+		std::vector<unsigned char> message = recvpoint->read();
+		if (message.size() > 0) {
+			printw("\r%s", &message[0]);
+			for(const auto& sendpoint: endpoints)
+				if(sendpoint != recvpoint)
+					sendpoint->write(message);
+			output = true;
+		}
 	}
+	// If we printed out some input, redraw the current line of
+	// input.
+	if (output) printw("> %s", stream.str().c_str());
 }
 
-int main(int argCount, char* argArray[]) {
+int main() {
 	WINDOW* window = setupWindow();
-	printw("Connecting...\n");
-	while(1) {
+	while(true) {
 		try {
 			jsock::TcpServer server(1234);
-			jsock::TcpEndpoint socket = server.accept();
-			printw("Connected!\n");
+			printw("Server listening\n");
+			std::vector<std::unique_ptr<jsock::Endpoint>> endpoints;
 			std::stringstream stream;
 			printw("> ");
-			while(1) {
-				processSocketOutput(socket, stream);
-				processSocketInput(socket, stream);
+			while(true) {
+				acceptNewConnections(endpoints, server);
+				processSocketOutput(endpoints, stream);
+				processSocketInput(endpoints, stream);
 			}
 		}
 		catch(const jsock::SocketException& problem) {
@@ -93,7 +145,7 @@ int main(int argCount, char* argArray[]) {
 					// ignore
 					break;
 				default:
-					endwin();
+					endwin(); // shutdown ui framework
 					std::cout
 						<< "Error "
 						<< problem.errorNumber()
