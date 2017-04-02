@@ -14,37 +14,38 @@
 // completed message.
 class ParsingEndpoint: public virtual jsock::Endpoint {
 	private:
-		std::vector<unsigned char> buffer;
+		std::unique_ptr<std::vector<unsigned char>> buffer;
 		std::unique_ptr<jsock::Endpoint> socket;
 
 	public:
 		ParsingEndpoint(std::unique_ptr<jsock::Endpoint> socket):
-				socket(std::move(socket)) {}
+				socket(std::move(socket)),
+				buffer(new std::vector<unsigned char>()) {}
 
 		// Passthrough to the underlying socket
-		void write(const std::vector<unsigned char>& data) {
+		void write(const std::vector<unsigned char>& data) const {
 			this->socket->write(data);
 		}
 
 		// Reads data from the socket and appends it to the running
 		// data buffer. If at least one message is completed, return
 		// it/them to the caller. Otherwise, return an empty vector.
-		std::vector<unsigned char> read() {
+		std::vector<unsigned char> read() const {
 			std::vector<unsigned char> received = this->socket->read();
-			this->buffer.insert(this->buffer.end(), received.begin(),
+			this->buffer->insert(this->buffer->end(), received.begin(),
 					received.end());
 
 			// Find the last instance of the newline character. This
 			// signifies a message boundary.
 			std::vector<unsigned char>::reverse_iterator lastNewline;
-			lastNewline = std::find(buffer.rbegin(), this->buffer.rend(), '\n');
+			lastNewline = std::find(buffer->rbegin(), this->buffer->rend(), '\n');
 
 			// If we found something, grab everything before the newline
 			// and print it. Leave the rest in buffer.
-			if (lastNewline != buffer.rend()) {
-				std::vector<unsigned char> message(this->buffer.begin(),
+			if (lastNewline != buffer->rend()) {
+				std::vector<unsigned char> message(this->buffer->begin(),
 					lastNewline.base());
-				this->buffer.erase(this->buffer.begin(), lastNewline.base());
+				this->buffer->erase(this->buffer->begin(), lastNewline.base());
 				message.push_back('\0');
 				return message;
 			}

@@ -35,13 +35,13 @@ TcpEndpoint::~TcpEndpoint() {
 	shutdown(this->socket, SHUT_RDWR);
 }
 
-void TcpEndpoint::write(const std::vector<unsigned char>& data) {
+void TcpEndpoint::write(const std::vector<unsigned char>& data) const {
 	this->socket.throwIfError();
 	if(send(this->socket, &data[0], data.size(), MSG_DONTWAIT) < 0)
 		throw SocketException(errno);
 }
 
-std::vector<unsigned char> TcpEndpoint::read() {
+std::vector<unsigned char> TcpEndpoint::read() const {
 	this->socket.throwIfError();
 	int readSize = recv(this->socket, (void*)this->buffer,
 			TcpEndpoint::MAX_READ_SIZE, MSG_DONTWAIT);

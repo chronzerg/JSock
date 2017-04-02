@@ -19,11 +19,8 @@ class TcpEndpoint: public virtual Endpoint {
 		TcpEndpoint(const std::string&, unsigned short);
 		TcpEndpoint(int fileDescriptor);
 		~TcpEndpoint();
-
-		// write() and read() could be const methods, but
-		// the interface calls for non-const.
-		void write(const std::vector<unsigned char>&);
-		std::vector<unsigned char> read();
+		void write(const std::vector<unsigned char>&) const;
+		std::vector<unsigned char> read() const;
 };
 
 } // namespace jsock
