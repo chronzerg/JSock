@@ -73,8 +73,12 @@ int main(int argCount, char* argArray[]) {
 	printw("Connecting...\n");
 	while(1) {
 		try {
-			jsock::TcpEndpoint socket("127.0.0.1", 1234);
-			printw("Connected!\n");
+			jsock::TcpEndpoint socket(
+				jsock::Authority("127.0.0.1", 1234));
+			std::string remote = socket.remote();
+			std::string local = socket.local(); 
+			printw("Connected to %s via %s\n",
+				remote.c_str(), local.c_str());
 			std::stringstream stream;
 			printw("> ");
 			while(1) {
@@ -86,6 +90,7 @@ int main(int argCount, char* argArray[]) {
 			printw("\r"); // reset current line
 			switch(problem.errorNumber()) {
 				case EPIPE:
+				case ECONNRESET:
 					printw("Disconnected!\n");
 					break;
 				case ECONNREFUSED:

@@ -51,6 +51,9 @@ class ParsingEndpoint: public virtual jsock::Endpoint {
 			}
 			return std::vector<unsigned char>();
 		}
+
+		jsock::Authority remote() const { return this->socket->remote(); }
+		jsock::Authority local() const { return this->socket->local(); }
 };
 
 // Initializes the ncurses library as our UI
@@ -70,10 +73,15 @@ void acceptNewConnections(
 		std::vector<std::unique_ptr<jsock::Endpoint>>& endpoints,
 		jsock::TcpServer& server) {
 	std::unique_ptr<jsock::Endpoint> client = server.accept();
-	if (client)
+	if (client) {
+		std::string remote = client->remote();
+		std::string local = client->local();
+		printw("Connected to %s via %s",
+				remote.c_str(), local.c_str());
 		endpoints.push_back(
 			std::unique_ptr<jsock::Endpoint>(
 				new ParsingEndpoint(std::move(client))));
+	}
 }
 
 // Collect input from stdin. Send what we've collected
@@ -140,6 +148,7 @@ int main() {
 			printw("\r"); // reset current line
 			switch(problem.errorNumber()) {
 				case EPIPE:
+				case ECONNRESET:
 					printw("Disconnected!\n");
 					break;
 				case ECONNREFUSED:

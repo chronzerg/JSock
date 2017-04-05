@@ -4,6 +4,7 @@
 #include "SocketException.h"
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <sstream>
 #include <string>
 
 namespace jsock {
@@ -12,54 +13,68 @@ namespace jsock {
 // said pair from human readable to OS readable form.
 class Authority {
 	private:
-		struct sockaddr_in _sockStruct;
-		std::string _address;
-		unsigned int _port;
+		struct sockaddr_in sockStruct_;
+		std::string address_;
+		unsigned int port_;
+		std::string str_;
 
 		void parse() {
-			this->_sockStruct.sin_family = AF_INET;
-			this->_sockStruct.sin_port = htons(this->_port);
+			this->sockStruct_.sin_family = AF_INET;
+			this->sockStruct_.sin_port = htons(this->port_);
 
-			int error = inet_pton(AF_INET, this->_address.c_str(),
-					&(this->_sockStruct.sin_addr));
+			int error = inet_pton(AF_INET, this->address_.c_str(),
+					&(this->sockStruct_.sin_addr));
 			if(error == 0) {
 				// TODO - Think of a better exception, one that can be
 				// programmatically checked.
 				std::string errorString("Invalid IP address: ");
-				errorString += this->_address;
+				errorString += this->address_;
 				throw SocketException(errorString);
 			}
 			else if (error < 0)
 				throw SocketException(errno);
 		}
 
+		void stringify() {
+			std::stringstream stream;
+			stream << this->address_ << ":"  << this->port_;
+			str_ = stream.str();
+		}
+
 	public:
 		Authority(const std::string& address, unsigned int port):
-				_address(address), _port(port) {
+				address_(address), port_(port) {
 			parse();
+			stringify();
 		}
 
 		Authority(const Authority& other):
-				_address(other.address()), _port(other.port()) {
+				address_(other.address()), port_(other.port()) {
 			parse();
+			stringify();
 		}
 
 		Authority(const struct sockaddr_in& cstruct) {
-			this->_sockStruct = cstruct;
-			this->_port = ntohs(cstruct.sin_port);
+			this->sockStruct_ = cstruct;
+			this->port_ = ntohs(cstruct.sin_port);
 
 			char buffer[INET_ADDRSTRLEN];
 			if(inet_ntop(AF_INET, &cstruct.sin_addr,
-				(char*)&buffer, INET_ADDRSTRLEN) == NULL)
+				buffer, INET_ADDRSTRLEN) == NULL)
 					throw SocketException(errno);
-			this->_address = std::string(buffer);
+			this->address_ = std::string(buffer);
+			stringify();
 		}
 
-		std::string address() const { return this->_address; }
-		unsigned int port() const { return this->_port; }
+		std::string address() const { return this->address_; }
+		unsigned int port() const { return this->port_; }
 
 		operator struct sockaddr_in() const {
-			return this->_sockStruct;
+			return this->sockStruct_;
+		}
+
+		operator std::string() const {
+			return this->str_;
 		}
 };
 
