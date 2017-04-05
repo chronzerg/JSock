@@ -10,7 +10,7 @@
 namespace jsock {
 
 Socket::Socket(SocketType type) {
-	this->fileDescriptor = socket(AF_INET, SOCK_STREAM, 0);
+	this->fileDescriptor = socket(AF_INET, type, 0);
 	if (this->fileDescriptor < 0) {
 		throw SocketException(errno);
 	}

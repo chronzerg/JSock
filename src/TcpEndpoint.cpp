@@ -1,6 +1,5 @@
 #include "TcpEndpoint.h"
 #include <sys/socket.h>
-#include <arpa/inet.h>
 #include <algorithm>
 #include <string.h>
 #include <fcntl.h>
@@ -8,24 +7,11 @@
 
 namespace jsock {
 
-TcpEndpoint::TcpEndpoint(const std::string& address,
-		unsigned short port): socket(stream) {
-	struct sockaddr_in addressStruct;
-	addressStruct.sin_family = AF_INET;
-	addressStruct.sin_port = htons(port);
-
-	int error = inet_pton(AF_INET, address.c_str(),
-			&(addressStruct.sin_addr));
-	if(error == 0) {
-		std::string errorString("Invalid IP address: ");
-		errorString += address;
-		throw SocketException(errorString);
-	}
-	else if (error < 0)
-		throw SocketException(errno);
-
-	if(connect(this->socket, (struct sockaddr*)&addressStruct,
-		sizeof(addressStruct)) < 0) throw SocketException(errno);
+TcpEndpoint::TcpEndpoint(const Authority& destination):
+		socket(stream), remote(destination) {
+	struct sockaddr_in dest = destination;
+	if(connect(this->socket, (struct sockaddr*)&dest,
+		sizeof(dest)) < 0) throw SocketException(errno);
 }
 
 TcpEndpoint::TcpEndpoint(int fileDescriptor):

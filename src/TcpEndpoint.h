@@ -12,11 +12,14 @@ namespace jsock {
 class TcpEndpoint: public virtual Endpoint {
 	private:
 		Socket socket;
+		Authority remote;
+		Authority local;
+
 		const static unsigned int MAX_READ_SIZE = 256;
 		unsigned char buffer[TcpEndpoint::MAX_READ_SIZE];
 
 	public:
-		TcpEndpoint(const std::string&, unsigned short);
+		TcpEndpoint(const Authority& destination);
 		TcpEndpoint(int fileDescriptor);
 		~TcpEndpoint();
 		void write(const std::vector<unsigned char>&) const;
