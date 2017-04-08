@@ -14,8 +14,8 @@
 // completed message.
 class ParsingEndpoint: public virtual jsock::Endpoint {
 	private:
-		std::unique_ptr<std::vector<unsigned char>> buffer;
 		std::unique_ptr<jsock::Endpoint> socket;
+		std::unique_ptr<std::vector<unsigned char>> buffer;
 
 	public:
 		ParsingEndpoint(std::unique_ptr<jsock::Endpoint> socket):
@@ -52,8 +52,9 @@ class ParsingEndpoint: public virtual jsock::Endpoint {
 			return std::vector<unsigned char>();
 		}
 
-		jsock::Authority remote() const { return this->socket->remote(); }
-		jsock::Authority local() const { return this->socket->local(); }
+		jsock::Name getName(Side side) const {
+			return this->socket->getName(side);
+		}
 };
 
 // Initializes the ncurses library as our UI
@@ -71,13 +72,15 @@ WINDOW* setupWindow() {
 // If we get one, add it to the endpoints vector.
 void acceptNewConnections(
 		std::vector<std::unique_ptr<jsock::Endpoint>>& endpoints,
+		std::stringstream& stream,
 		jsock::TcpServer& server) {
 	std::unique_ptr<jsock::Endpoint> client = server.accept();
 	if (client) {
-		std::string remote = client->remote();
-		std::string local = client->local();
-		printw("Connected to %s via %s",
+		std::string remote = client->getName(jsock::Endpoint::Remote);
+		std::string local = client->getName(jsock::Endpoint::Local);
+		printw("\rConnected to %s via %s\n",
 				remote.c_str(), local.c_str());
+		printw("> %s", stream.str().c_str());
 		endpoints.push_back(
 			std::unique_ptr<jsock::Endpoint>(
 				new ParsingEndpoint(std::move(client))));
@@ -139,7 +142,7 @@ int main() {
 			std::stringstream stream;
 			printw("> ");
 			while(true) {
-				acceptNewConnections(endpoints, server);
+				acceptNewConnections(endpoints, stream, server);
 				processSocketOutput(endpoints, stream);
 				processSocketInput(endpoints, stream);
 			}

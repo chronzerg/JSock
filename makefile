@@ -1,7 +1,7 @@
 libFile=jsock.a
 
 libs=-lncurses
-flags=-g -std=c++11 $(libs)
+flags=-Wall -g -std=c++11 $(libs)
 
 libSource=$(shell find "src" -iname "*.cpp")
 libObjects=$(libSource:.cpp=.o)

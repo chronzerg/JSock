@@ -4,37 +4,19 @@
 #include <string.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <cassert>
 
 namespace jsock {
 
-TcpEndpoint::TcpEndpoint(const Authority& destination):
-		socket_(stream), remote_(new Authority(destination)) {
+TcpEndpoint::TcpEndpoint(const Name& destination):
+		socket_(stream) {
 	struct sockaddr_in dst = destination;
 	if(connect(this->socket_, (struct sockaddr*)&dst,
 		sizeof(dst)) < 0) throw SocketException(errno);
-
-	struct sockaddr_in local;
-	socklen_t size = sizeof(local);
-	if(getsockname(this->socket_, (struct sockaddr*)&local,
-		&size) < 0) throw SocketException(errno);
-	local_ = std::unique_ptr<Authority>(new Authority(local));
 }
 
 TcpEndpoint::TcpEndpoint(int fileDescriptor):
-		socket_(fileDescriptor) {
-	struct sockaddr_in remote;
-	socklen_t rsize = sizeof(remote);
-	if(getpeername(this->socket_, (struct sockaddr*)&remote,
-		&rsize) < 0) throw SocketException(errno);
-	local_ = std::unique_ptr<Authority>(new Authority(remote));
-
-
-	struct sockaddr_in local;
-	socklen_t lsize = sizeof(local);
-	if(getsockname(this->socket_, (struct sockaddr*)&local,
-		&lsize) < 0) throw SocketException(errno);
-	local_ = std::unique_ptr<Authority>(new Authority(local));
-}
+		socket_(fileDescriptor) { }
 
 TcpEndpoint::~TcpEndpoint() {
 	shutdown(this->socket_, SHUT_RDWR);
@@ -59,12 +41,19 @@ std::vector<unsigned char> TcpEndpoint::read() const {
 		this->buffer + std::max(readSize, 0));
 }
 
-Authority TcpEndpoint::remote() const {
-	return *(this->remote_);
-}
-
-Authority TcpEndpoint::local() const {
-	return *(this->local_);
+Name TcpEndpoint::getName(Side side) const {
+	struct sockaddr_in name;
+	socklen_t size = sizeof(name);
+	if(side == Local) {
+		if(getsockname(this->socket_, (struct sockaddr*)&name,
+			&size) < 0) throw SocketException(errno);
+	}
+	else {
+		assert(side == Remote);
+		if(getpeername(this->socket_, (struct sockaddr*)&name,
+			&size) < 0) throw SocketException(errno);
+	}
+	return Name(name);
 }
 
 }; //namespace jsock

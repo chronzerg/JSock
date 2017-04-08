@@ -74,9 +74,9 @@ int main(int argCount, char* argArray[]) {
 	while(1) {
 		try {
 			jsock::TcpEndpoint socket(
-				jsock::Authority("127.0.0.1", 1234));
-			std::string remote = socket.remote();
-			std::string local = socket.local(); 
+				jsock::Name("127.0.0.1", 1234));
+			std::string remote = socket.getName(jsock::Endpoint::Remote);
+			std::string local = socket.getName(jsock::Endpoint::Local); 
 			printw("Connected to %s via %s\n",
 				remote.c_str(), local.c_str());
 			std::stringstream stream;

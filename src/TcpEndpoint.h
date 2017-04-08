@@ -9,23 +9,22 @@
 
 namespace jsock {
 
+// A connected TCP pipe
 class TcpEndpoint: public virtual Endpoint {
-	private:
-		Socket socket_;
-		std::unique_ptr<Authority> remote_;
-		std::unique_ptr<Authority> local_;
+private:
+	Socket socket_;
+	const static unsigned int MAX_READ_SIZE = 256;
+	unsigned char buffer[TcpEndpoint::MAX_READ_SIZE];
 
-		const static unsigned int MAX_READ_SIZE = 256;
-		unsigned char buffer[TcpEndpoint::MAX_READ_SIZE];
+public:
+	TcpEndpoint(const Name& destination);
+	TcpEndpoint(int fileDescriptor);
+	TcpEndpoint(const TcpEndpoint& other) = delete;
+	~TcpEndpoint();
 
-	public:
-		TcpEndpoint(const Authority& destination);
-		TcpEndpoint(int fileDescriptor);
-		~TcpEndpoint();
-		void write(const std::vector<unsigned char>&) const;
-		std::vector<unsigned char> read() const;
-		Authority remote() const;
-		Authority local() const;
+	void write(const std::vector<unsigned char>&) const;
+	std::vector<unsigned char> read() const;
+	Name getName(Side side) const;
 };
 
 } // namespace jsock
