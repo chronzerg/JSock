@@ -1,4 +1,4 @@
-#include "../src/TcpEndpoint.h"
+#include "jsock/TcpEndpoint.h"
 #include <algorithm>
 #include <ncurses.h>
 #include <iostream>

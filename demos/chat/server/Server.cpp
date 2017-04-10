@@ -1,4 +1,5 @@
-#include "../src/TcpServer.h"
+#include "jsock/TcpServer.h"
+#include "ParsingEndpoint.h"
 #include <algorithm>
 #include <ncurses.h>
 #include <iostream>
@@ -9,53 +10,6 @@
 #include <vector>
 #include <string>
 
-// Collects message fragments from the underlying
-// endpoint and provides them to the caller as a
-// completed message.
-class ParsingEndpoint: public virtual jsock::Endpoint {
-	private:
-		std::unique_ptr<jsock::Endpoint> socket;
-		std::unique_ptr<std::vector<unsigned char>> buffer;
-
-	public:
-		ParsingEndpoint(std::unique_ptr<jsock::Endpoint> socket):
-				socket(std::move(socket)),
-				buffer(new std::vector<unsigned char>()) {}
-
-		// Passthrough to the underlying socket
-		void write(const std::vector<unsigned char>& data) const {
-			this->socket->write(data);
-		}
-
-		// Reads data from the socket and appends it to the running
-		// data buffer. If at least one message is completed, return
-		// it/them to the caller. Otherwise, return an empty vector.
-		std::vector<unsigned char> read() const {
-			std::vector<unsigned char> received = this->socket->read();
-			this->buffer->insert(this->buffer->end(), received.begin(),
-					received.end());
-
-			// Find the last instance of the newline character. This
-			// signifies a message boundary.
-			std::vector<unsigned char>::reverse_iterator lastNewline;
-			lastNewline = std::find(buffer->rbegin(), this->buffer->rend(), '\n');
-
-			// If we found something, grab everything before the newline
-			// and print it. Leave the rest in buffer.
-			if (lastNewline != buffer->rend()) {
-				std::vector<unsigned char> message(this->buffer->begin(),
-					lastNewline.base());
-				this->buffer->erase(this->buffer->begin(), lastNewline.base());
-				message.push_back('\0');
-				return message;
-			}
-			return std::vector<unsigned char>();
-		}
-
-		jsock::Name getName(Side side) const {
-			return this->socket->getName(side);
-		}
-};
 
 // Initializes the ncurses library as our UI
 // framework.
