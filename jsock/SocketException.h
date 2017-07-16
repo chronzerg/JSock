@@ -11,11 +11,13 @@ namespace jsock {
 struct SocketException: public std::exception {
 	private:
 		std::string message;
-		int errorNumber_ = -1;
+		int errorNumber_;
 
 	public:
 		SocketException(const std::string& message):
-			message(message) {}
+                message(message) {
+            errorNumber_ = 1;
+        }
 
 		SocketException(int errorNumber) {
 			this->errorNumber_ = errorNumber;

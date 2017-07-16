@@ -19,7 +19,6 @@ private:
 public:
 	TcpEndpoint(const Name& destination);
 	TcpEndpoint(int fileDescriptor);
-	TcpEndpoint(const TcpEndpoint& other) = delete;
 	~TcpEndpoint();
 
 	void write(const std::vector<unsigned char>&) const;

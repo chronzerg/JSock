@@ -1,0 +1,14 @@
+cxxflags = -Wall -std=c++11;
+
+$(call slib, jsock);
+
+$(call exec, demos/chat/client,
+    # Dependencies
+    jsock,
+
+    # Compile Flags
+    -I .,
+
+    # Linking Flags
+    -l ncurses
+);
