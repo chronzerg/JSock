@@ -30,8 +30,8 @@ void acceptNewConnections(
 		jsock::TcpServer& server) {
 	std::unique_ptr<jsock::Endpoint> client = server.accept();
 	if (client) {
-		std::string remote = client->getName(jsock::Endpoint::Remote);
-		std::string local = client->getName(jsock::Endpoint::Local);
+		std::string remote = client->getRemoteName();
+		std::string local = client->getLocalName();
 		printw("\rConnected to %s via %s\n",
 				remote.c_str(), local.c_str());
 		printw("> %s", stream.str().c_str());

@@ -6,20 +6,21 @@
 namespace jsock {
 
 enum SocketType {
-	datagram = SOCK_DGRAM,
-	stream = SOCK_STREAM
+    DATAGRAM = SOCK_DGRAM,
+    STREAM = SOCK_STREAM
 };
 
 class Socket {
-	private:
-		int fileDescriptor;
+private:
+    const int fileDescriptor;
 
-	public:
-		Socket(SocketType type);
-		Socket(int fileDescriptor);
-		~Socket();
-		operator int() const;
-		void throwIfError() const;
+public:
+    Socket(SocketType type);
+    Socket(int fileDescriptor);
+    ~Socket();
+
+    operator int() const;
+    void throwIfError() const;
 };
 
 } // namespace jsock

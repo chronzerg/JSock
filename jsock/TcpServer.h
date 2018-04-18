@@ -8,12 +8,12 @@
 namespace jsock {
 
 class TcpServer {
-	private:
-		Socket socket;
+private:
+    const Socket socket;
 
-	public:
-		TcpServer(unsigned int port);
-		std::unique_ptr<Endpoint> accept() const;
+public:
+    TcpServer(unsigned int port);
+    std::unique_ptr<Endpoint> accept() const;
 };
 
 } // namespace jsock

@@ -1,5 +1,2 @@
 .ycm*
-*.out
-*.o
-*.a
-*.dSYM
+build/

@@ -8,11 +8,11 @@
 namespace jsock {
 
 class Endpoint {
-	public:
-		enum Side { Local, Remote };
-		virtual void write(const std::vector<unsigned char>&) const = 0;
-		virtual std::vector<unsigned char> read() const = 0;
-		virtual Name getName(Side side) const = 0;
+public:
+    virtual void write(const std::vector<unsigned char>&) const = 0;
+    virtual std::vector<unsigned char> read() const = 0;
+    virtual Name getRemoteName() const = 0;
+    virtual Name getLocalName() const = 0;
 };
 
 } // namespace jsock

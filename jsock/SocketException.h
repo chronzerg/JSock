@@ -8,33 +8,16 @@
 
 namespace jsock {
 
-struct SocketException: public std::exception {
-	private:
-		std::string message;
-		int errorNumber_;
+class SocketException: public std::exception {
+public:
+    SocketException(const std::string& message);
+    SocketException(int errorNumber);
+    ~SocketException() throw();
 
-	public:
-		SocketException(const std::string& message):
-                message(message) {
-            errorNumber_ = 1;
-        }
+    virtual const char* what() const throw();
 
-		SocketException(int errorNumber) {
-			this->errorNumber_ = errorNumber;
-			std::stringstream errorStream;
-			errorStream << "Error " << errorNumber;
-			SocketException(errorStream.str());
-		}
-
-		~SocketException() throw () {}
-
-		const char* what() const throw() {
-			return message.c_str();
-		}
-
-		int errorNumber() const {
-			return this->errorNumber_;
-		}
+    const std::string message;
+    const int errorNumber;
 };
 
 } // namespace jsock
