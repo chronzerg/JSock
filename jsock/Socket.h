@@ -5,22 +5,19 @@
 
 namespace jsock {
 
-enum SocketType {
-    DATAGRAM = SOCK_DGRAM,
-    STREAM = SOCK_STREAM
-};
+enum SocketType { DATAGRAM = SOCK_DGRAM, STREAM = SOCK_STREAM };
 
 class Socket {
 private:
-    const int fileDescriptor;
+  const int fileDescriptor;
 
 public:
-    Socket(SocketType type);
-    Socket(int fileDescriptor);
-    ~Socket();
+  Socket(SocketType type);
+  Socket(int fileDescriptor);
+  ~Socket();
 
-    operator int() const;
-    void throwIfError() const;
+  operator int() const;
+  void throwIfError() const;
 };
 
 } // namespace jsock

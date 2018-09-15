@@ -2,10 +2,10 @@
 #define Name_h
 
 #include "SocketException.h"
-#include <sys/socket.h>
 #include <arpa/inet.h>
 #include <sstream>
 #include <string>
+#include <sys/socket.h>
 
 namespace jsock {
 
@@ -13,14 +13,14 @@ namespace jsock {
 // said pair from human readable to OS readable form.
 class Name {
 public:
-    const std::string address;
-    const unsigned int port;
+  const std::string address;
+  const unsigned int port;
 
-    Name(const std::string& address, unsigned int port);
-    Name(const sockaddr_in& cstruct);
+  Name(const std::string &address, unsigned int port);
+  Name(const sockaddr_in &cstruct);
 
-    operator sockaddr_in() const;
-    operator std::string() const;
+  operator sockaddr_in() const;
+  operator std::string() const;
 };
 
 } // namespace jsock
