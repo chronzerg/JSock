@@ -1,3 +1,5 @@
+#pragma once
+
 #include "jsock/Endpoint.h"
 #include <memory>
 #include <vector>

@@ -1,5 +1,4 @@
-#ifndef Name_h
-#define Name_h
+#pragma once
 
 #include "SocketException.h"
 #include <arpa/inet.h>
@@ -24,5 +23,3 @@ public:
 };
 
 } // namespace jsock
-
-#endif // Name_h

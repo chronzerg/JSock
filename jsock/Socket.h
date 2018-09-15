@@ -1,5 +1,4 @@
-#ifndef StreamSocket_h
-#define StreamSocket_h
+#pragma once
 
 #include <sys/socket.h>
 
@@ -21,5 +20,3 @@ public:
 };
 
 } // namespace jsock
-
-#endif // StreamSocket_h

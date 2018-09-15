@@ -1,5 +1,4 @@
-#ifndef Endpoint_h
-#define Endpoint_h
+#pragma once
 
 #include "Name.h"
 #include <string>
@@ -16,5 +15,3 @@ public:
 };
 
 } // namespace jsock
-
-#endif // Endpoint_h

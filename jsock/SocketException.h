@@ -1,5 +1,4 @@
-#ifndef SocketException_h
-#define SocketException_h
+#pragma once
 
 #include <exception>
 #include <sstream>
@@ -21,5 +20,3 @@ public:
 };
 
 } // namespace jsock
-
-#endif // SocketException_h

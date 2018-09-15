@@ -1,5 +1,4 @@
-#ifndef TcpServer_h
-#define TcpServer_h
+#pragma once
 
 #include "Socket.h"
 #include "TcpEndpoint.h"
@@ -17,5 +16,3 @@ public:
 };
 
 } // namespace jsock
-
-#endif // TcpServer_h
