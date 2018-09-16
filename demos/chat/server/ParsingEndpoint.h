@@ -23,5 +23,6 @@ public:
   // it/them to the caller. Otherwise, return an empty vector.
   std::vector<unsigned char> read() const;
 
-  jsock::Name getName(Side side) const;
+  jsock::Name getRemoteName() const;
+  jsock::Name getLocalName() const;
 };

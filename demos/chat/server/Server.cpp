@@ -99,7 +99,7 @@ int main() {
       }
     } catch (const jsock::SocketException &problem) {
       printw("\r"); // reset current line
-      switch (problem.errorNumber()) {
+      switch (problem.errorNumber) {
       case EPIPE:
       case ECONNRESET:
         printw("Disconnected!\n");
@@ -109,7 +109,7 @@ int main() {
         break;
       default:
         endwin(); // shutdown ui framework
-        std::cout << "Error " << problem.errorNumber() << std::endl;
+        std::cout << "Error " << problem.errorNumber << std::endl;
         exit(1);
       }
 

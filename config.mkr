@@ -1,8 +1,19 @@
-cxxflags = -Wall -std=c++11;
+cxxFlags = -Wall -std=c++17;
 
 $(call slib, jsock);
 
 $(call exec, demos/chat/client,
+    # Dependencies
+    jsock,
+
+    # Compile Flags
+    -I .,
+
+    # Linking Flags
+    -l ncurses
+);
+
+$(call exec, demos/chat/server,
     # Dependencies
     jsock,
 

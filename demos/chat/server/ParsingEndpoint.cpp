@@ -32,6 +32,10 @@ std::vector<unsigned char> ParsingEndpoint::read() const {
   return std::vector<unsigned char>();
 }
 
-jsock::Name ParsingEndpoint::getName(Side side) const {
-  return this->socket->getName(side);
+jsock::Name ParsingEndpoint::getRemoteName() const {
+  return this->socket->getRemoteName();
+}
+
+jsock::Name ParsingEndpoint::getLocalName() const {
+  return this->socket->getLocalName();
 }
