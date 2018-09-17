@@ -14,8 +14,8 @@
 // framework.
 WINDOW *setupWindow() {
   WINDOW *window = initscr();
-  if (nodelay(window, true) == ERR) {
-    printw("nodelay init failed");
+  if (halfdelay(1) == ERR) {
+    printw("window init failed");
     exit(1);
   }
   return window;
